@@ -1,0 +1,25 @@
+#calendar {
+    width: 200px;
+    height: 200px;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    background-color: #d3d3d3;
+}
+
+.day{
+    border: 1px solid #fff;
+
+}
+
+.invalid {
+    background-color: #969494;
+}
+
+.weekend{
+    background-color:  #e9df50;
+}
+
+.valid{
+    background-color: #0dc90d;
+
+}
