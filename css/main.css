@@ -1,14 +1,18 @@
-#calendar {
-    width: 200px;
-    height: 200px;
-    border: 1px solid #eee;
+.calendar{
+    padding: 5px;
+    margin: 10px;
+    text-align: center;
     border-radius: 10px;
+    font-size: 16px;
     background-color: #d3d3d3;
 }
 
 .day{
     border: 1px solid #fff;
-
+    width: 18px;
+    height: 24px;
+    padding: 5px;
+    border: 1px solid #fff;
 }
 
 .invalid {
