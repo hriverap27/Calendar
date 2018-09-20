@@ -2,10 +2,11 @@ angular.module("calendarApp",[])
     .factory("datesBuilder", function(){
         // Returns months between two dates.
         
-        var code = "en-IN"; //es-cr
+         //"en-IN"; es-cr
         var builder = {};
-        builder.getDates = function(startDate, daysNumber){
+        builder.getDates = function(startDate, daysNumber, languageCode){
 
+            var code = languageCode;
             var fromDate = new Date(startDate); // date to start
             var toDate = new Date (fromDate);
             toDate = toDate.addDays(daysNumber);  // date to end
@@ -236,12 +237,58 @@ angular.module("calendarApp",[])
 
          return builder;
     })
-    .controller("calendarCtrlr", function($scope, datesBuilder, calendarBuilder){
+    .service("languageService", function(){
+        this.key = "languagesLocalData";
+        this.languages;
 
+        this.getLanguages = function(){
+        var path = "scripts/countries.json";
+
+            if(sessionStorage.getItem(this.key) !== null){
+                this.languages = JSON.parse(sessionStorage.getItem(this.key));
+                console.log("countries",this.languages);
+            }
+            else{
+                $.getJSON( path, {
+                    format: "json"
+                })
+                .done(function(data) {
+                    this.languages = data;
+                    sessionStorage.setItem("languagesLocalData", JSON.stringify(this.languages));
+                    
+                    console.log("countries",this.languages);
+                })
+                .fail(function(textStatus, error) {
+                    alert("Something went wrong!");
+                    var err = textStatus + ", " + error;
+                    console.log( "Request Failed: " + err );
+                });
+            }
+        }
+
+        this.getLanguageByCode = function(code){
+            this.getLanguages();
+
+            var result = $.grep( this.languages.countries, function( n, i ) {
+            return n.code.toUpperCase() == code.toUpperCase();
+            });
+
+            if(result){
+                return result[0].language;
+            }
+            else{
+                return "en-us";
+            }
+            return
+
+            console.log(result);
+        }
+    })
+    .controller("calendarCtrlr", function($scope, datesBuilder, calendarBuilder, languageService){
         angular.element(document).ready(function () {
-            var dates = datesBuilder.getDates("9/10/2018", 206);
+            var language = languageService.getLanguageByCode("BH");
+            var dates = datesBuilder.getDates("9/10/2018", 206, language);
             var calendar = calendarBuilder.createCalendar(dates);
             $('#calendar-container').append(calendar);
-
         });
     });
