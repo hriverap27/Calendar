@@ -30,7 +30,7 @@ angular.module("calendarApp",[])
                             _date:toDate,
                             _firstDate: 1,
                             _lastDate:toDate.getDate(),
-                            _firstWeekDay:new Date(toDate.toLocaleString(code, { month: "long" }) + " " + "1" + toDate.getFullYear()).getDay(),
+                            _firstWeekDay: new Date(toDate.getFullYear(), toDate.getMonth(), 01).getDay(),//new Date(toDate.toLocaleString(code, { month: "long" }) + " " + "1" + toDate.getFullYear()).getDay(),
                             _month:toDate.toLocaleString(code, { month: "long" }).toUpperCase(),
                             _year:toDate.getFullYear()
                         };
@@ -61,7 +61,7 @@ angular.module("calendarApp",[])
                             _date:d,
                             _firstDate: 1,
                             _lastDate:new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(),
-                            _firstWeekDay:new Date(d.toLocaleString(code, { month: "long" }) + " " + "1" + d.getFullYear()).getDay(),
+                            _firstWeekDay:new Date(d.getFullYear(), d.getMonth(), 01).getDay(),
                             _month:d.toLocaleString(code, { month: "long" }).toUpperCase(),
                             _year:d.getFullYear()
                         };
@@ -242,7 +242,7 @@ angular.module("calendarApp",[])
         this.languages;
 
         this.getLanguages = function(){
-        var path = "scripts/countries.json";
+            var path = "scripts/countries.json";
 
             if(sessionStorage.getItem(this.key) !== null){
                 this.languages = JSON.parse(sessionStorage.getItem(this.key));
@@ -267,7 +267,7 @@ angular.module("calendarApp",[])
         }
 
         this.getLanguageByCode = function(code){
-            this.getLanguages();
+            //this.getLanguages();
 
             var result = $.grep( this.languages.countries, function( n, i ) {
             return n.code.toUpperCase() == code.toUpperCase();
@@ -286,9 +286,58 @@ angular.module("calendarApp",[])
     })
     .controller("calendarCtrlr", function($scope, datesBuilder, calendarBuilder, languageService){
         angular.element(document).ready(function () {
-            var language = languageService.getLanguageByCode("BH");
-            var dates = datesBuilder.getDates("9/10/2018", 206, language);
-            var calendar = calendarBuilder.createCalendar(dates);
-            $('#calendar-container').append(calendar);
+            //Objects Initialization
+
+            $scope.selectedCountry;
+            $scope.selectedDays;
+            $scope.selectedDate;
+            $scope.inputType = "text";
+
+            $("#formModal").modal("show");
+            languageService.getLanguages();
+            $scope.languages = languageService.languages;
+            $scope.$apply()
+            
         });
+
+        function selectNewDate(){
+            $('#calendar-container').empty();
+            
+            //Getting the language code.
+            var language = languageService.getLanguageByCode($scope.selectedCountry);
+
+            //Getting the dates to show.
+            var dates = datesBuilder.getDates($scope.selectedDate, parseInt($scope.selectedDays), language);
+            
+            //Getting the calendar.
+            var calendar = calendarBuilder.createCalendar(dates);
+
+            //Inserting the calendar into the DOM.
+            $('#calendar-container').append(calendar);
+
+            //Hiding the pop up.
+            $("#formModal").modal("hide");
+        }
+
+        $scope.validateInputs = function(){
+
+            $("#inputDate").removeClass("bg-danger"); 
+            $("#inputDays").removeClass("bg-danger"); 
+            $("#inputCode").removeClass("bg-danger");
+
+            var isValid = Date.parse($scope.selectedDate);
+            if (isNaN(isValid) != false) {
+                $("#inputDate").addClass("bg-danger"); 
+            }
+            else if($scope.selectedCountry.replace(/_/g, '').length != 2){
+                $("#inputCode").addClass("bg-danger"); 
+            }
+            else if($scope.selectedDays.replace(/_/g, '').replace(/0/g, '').length < 1){
+                $("#inputDays").addClass("bg-danger"); 
+            }
+            else{
+               selectNewDate();
+            }
+        }
+
     });

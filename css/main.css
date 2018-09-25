@@ -27,3 +27,8 @@
     background-color: #0dc90d;
 
 }
+
+#modalWrapper{
+    position: absolute;
+    top: 0px;
+}
